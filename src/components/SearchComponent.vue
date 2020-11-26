@@ -5,24 +5,26 @@
         <button id="search-button" @click="getBatterIdByName(); getPitcherIdByName();">
             Search
         </button>
-        <p>
-            {{this.pitcherId}} and {{this.batterId}}
-        </p>
+        <ResultsComponent v-bind:pitcherId='this.pitcherId' v-bind:batterId='this.batterId'/>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import ResultsComponent from "./ResultsComponent";
+
 
 export default {
     data: function() {
         return {
-            results: [],
             batterName: "",
             pitcherName: "",
-            batterId: "",
-            pitcherId: ""
+            pitcherId: "",
+            batterId: ""
         }
+    },
+    components: {
+        ResultsComponent
     },
     methods: {
         getPitcherIdByName: function() {
@@ -30,6 +32,7 @@ export default {
                  .then(response => {
                      if(response.status == 200) {
                          this.pitcherId = response['data'][0]['player_id']
+                         console.log("one")
                      }
                      else {
                          console.log(response.error);
@@ -40,7 +43,8 @@ export default {
             axios.get('https://api.blaseball-reference.com/v1/playerIdsByName', { params: { name: this.batterName, current: true} })
                  .then(response => {
                      if(response.status == 200) {
-                         this.batterId = response['data'][0]['player_id']
+                        this.batterId = response['data'][0]['player_id']
+                        console.log("two")
                      }
                      else {
                          console.log(response.error)
