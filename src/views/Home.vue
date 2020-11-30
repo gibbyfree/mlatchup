@@ -1,5 +1,6 @@
 <template>
     <div id="home">
+        <p>hi</p>
         <SearchComponent/>
     </div>
 </template>
