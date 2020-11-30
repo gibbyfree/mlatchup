@@ -5,12 +5,20 @@
         <button id="search-button" @click="executeSearch();">
             Search
         </button>
-        {{this.results}}
+        <div v-if="ready">
+            <ul v-for="result in this.results" :key="result.id">
+                <li v-for="event in result" :key="event.id">
+                    {{event.event_type}}
+                </li>
+            </ul>
+            {{this.results}}
+        </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import _ from 'lodash';
 
 
 export default {
@@ -20,12 +28,14 @@ export default {
             pitcherName: "",
             pitcherId: "",
             batterId: "", 
-            results: []
+            results: [],
+            ready: false
         }
     },
     components: {},
     methods: {
         executeSearch: function() {
+            // First, get the pitcher's ID. 
             this.getPitcherIdByName();            
         },
         getResults: function() {
@@ -35,7 +45,10 @@ export default {
                  .then(response => {
                      if(response.status == 200) {
                          this.results = response['data']['results']
-                         console.log("got results")
+                         // Group the data by games.
+                         this.results = _.groupBy(this.results, 'game_id')
+                         // Results are ready to render.
+                         this.ready = true
                      }
                      else {
                          console.log(response.error);
@@ -48,6 +61,7 @@ export default {
                      if(response.status == 200) {
                          this.pitcherId = response['data'][0]['player_id']
                          console.log("one")
+                         // Second, get the batter's ID. 
                          this.getBatterIdByName();
                      }
                      else {
@@ -61,6 +75,7 @@ export default {
                      if(response.status == 200) {
                         this.batterId = response['data'][0]['player_id']
                         console.log("two")
+                        // Get the event data from the API with these IDs. 
                         this.getResults();
                      }
                      else {
